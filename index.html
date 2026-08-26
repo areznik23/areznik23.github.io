@@ -1,168 +1,1302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="comments.png" type="image/png">
-    <title>Personalized Messaging</title>
-    <style>
-        body, html {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #eff4f9;
-            color: #333;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>rez</title>
+<link rel="stylesheet" href="design-system.css">
+<style>
+  html, body { height: 100%; overflow: hidden; }
+  .container { padding-top: 0; padding-bottom: 0; }
+  .landing {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    height: 100svh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .landing-head {
+    text-align: center;
+    padding-top: 6vh;
+    transition: transform 0.35s ease;
+  }
+  .landing.widget-open .landing-head {
+    transform: translateY(-3vh);
+  }
+  .top-bar {
+    position: absolute;
+    top: 0;
+    left: 64px;
+    right: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .year-clock .pct { color: var(--ink); font-weight: 500; }
+  .locale { color: var(--muted); }
+  .locale .place { color: var(--ink); font-weight: 500; }
+  .landing-head h1 {
+    position: relative;
+    display: inline-block;
+  }
+  .landing-head .wordmark {
+    display: block;
+    width: clamp(180px, 20vw, 280px);
+    margin: 0 auto;
+  }
+  .launch-btn {
+    position: absolute;
+    right: 13.5%;
+    bottom: 9.5%;
+    width: 11%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 3px solid #000;
+    background: #ff2d33;
+    box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.45);
+    cursor: pointer;
+    padding: 0;
+    opacity: 0;
+    transform: scale(0.5);
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .landing.launch-mode .launch-btn {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    animation: launch-pulse 1.6s ease-out infinite;
+  }
+  @keyframes launch-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 45, 51, 0.45); }
+    100% { box-shadow: 0 0 0 14px rgba(255, 45, 51, 0); }
+  }
+  .arc-photo {
+    transition: opacity 0.35s ease;
+  }
+  .landing.launch-mode .arc-photo,
+  .landing.launched .arc-photo {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .city {
+    position: absolute;
+    left: 1%;
+    bottom: 5svh;
+    width: clamp(190px, 22vw, 360px);
+    opacity: 0;
+    transform: translateY(14px);
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    z-index: 2;
+  }
+  .landing.launch-mode .city,
+  .landing.launched .city {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .city.boom {
+    width: clamp(125px, 14.5vw, 236px);
+    margin-left: 4vw;
+    margin-bottom: 0.5vw;
+  }
+  .rocket {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: clamp(70px, 9vw, 130px);
+    display: none;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .landing-head .wordmark.alt {
+    width: clamp(243px, 27vw, 378px);
+  }
+  .landing-head .wordmark.eyez {
+    width: clamp(225px, 25vw, 350px);
+  }
+  .landing-head .wordmark.uhoh {
+    width: clamp(220px, 24vw, 335px);
+  }
 
-        main, aside, footer {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            padding-left: 40px;
-            padding-right: 40px;
-            background: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+  .arc-stage {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    aspect-ratio: 2.7 / 1;
+  }
+  .arc-stage svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .arc-photo {
+    position: absolute;
+    display: block;
+    margin: 0;
+  }
+  .arc-photo img {
+    display: block;
+    width: 100%;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    background: var(--card);
+  }
+  .laser-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    aspect-ratio: 656 / 437;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 4;
+  }
+  .laser-beam {
+    fill: none;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    vector-effect: non-scaling-stroke;
+    animation: laser-fire 720ms ease-out forwards;
+  }
+  .laser-beam.glow {
+    stroke: #ff1748;
+    stroke-width: 15;
+    opacity: 0.75;
+    filter: drop-shadow(0 0 6px #ff1748);
+  }
+  .laser-beam.core {
+    stroke: #fff;
+    stroke-width: 3;
+  }
+  .laser-flare {
+    fill: #fff;
+    stroke: #ff1748;
+    stroke-width: 8;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: laser-flare 720ms ease-out forwards;
+  }
+  @keyframes laser-fire {
+    0% { stroke-dashoffset: 1; opacity: 0; }
+    6% { opacity: 1; }
+    22%, 100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  @keyframes laser-flare {
+    0% { opacity: 0; transform: scale(0.2); }
+    8% { opacity: 1; transform: scale(1.7); }
+    35% { opacity: 1; transform: scale(0.65); }
+    100% { opacity: 0; transform: scale(0.2); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .laser-beam {
+      stroke-dashoffset: 0;
+      animation: none;
+    }
+    .laser-flare {
+      animation: laser-fade 500ms linear forwards;
+    }
+  }
+  @keyframes laser-fade {
+    0%, 70% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .arc-photo figcaption {
+    margin-top: 8px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .arc-photo.left {
+    left: 18%;
+    bottom: 33%;
+    width: clamp(168px, 21vw, 315px);
+    transform: translate(-50%, 50%) rotate(-6deg);
+  }
+  .arc-photo.mid {
+    left: 50%;
+    bottom: 56%;
+    width: clamp(143px, 17.6vw, 264px);
+    transform: translate(-50%, 50%);
+    z-index: 2;
+    perspective: 800px;
+  }
+  .flip-inner {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+  }
+  .flip-front {
+    position: relative;
+  }
+  .flip-front.laser-cut > img {
+    clip-path: var(--kept-clip);
+  }
+  .cut-fragment {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: 5;
+    clip-path: var(--cut-clip);
+    transform-origin: 48% 45%;
+    will-change: transform, opacity;
+    animation: cut-fragment-fall 1.65s ease-in 240ms forwards;
+  }
+  .cut-fragment > img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+  }
+  .cut-seam {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 7;
+  }
+  .cut-seam line {
+    fill: none;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    vector-effect: non-scaling-stroke;
+  }
+  .cut-seam .cut-char {
+    stroke: #24100d;
+    stroke-width: 6;
+    stroke-dashoffset: 1;
+    animation: cut-char 900ms ease-out forwards;
+  }
+  .cut-seam .cut-hot {
+    stroke: #ff1748;
+    stroke-width: 15;
+    stroke-dashoffset: 1;
+    filter: drop-shadow(0 0 6px #ff5a24);
+    animation: cut-hot 720ms ease-out forwards;
+  }
+  .cut-seam .cut-core {
+    stroke: #fff;
+    stroke-width: 3;
+    stroke-dashoffset: 1;
+    animation: cut-hot 650ms ease-out forwards;
+  }
+  @keyframes cut-hot {
+    0% { stroke-dashoffset: 1; opacity: 0; }
+    8% { opacity: 1; }
+    36% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  @keyframes cut-char {
+    0%, 22% { stroke-dashoffset: 1; opacity: 0; }
+    52% { stroke-dashoffset: 0; opacity: 0.95; }
+    100% { stroke-dashoffset: 0; opacity: 0.85; }
+  }
+  @keyframes cut-fragment-fall {
+    0%, 12% { transform: translate(0, 0) rotate(0); opacity: 1; }
+    34% { transform: translate(-1.5vw, 5vh) rotate(-5deg); opacity: 1; }
+    100% { transform: translate(-24vw, 78vh) rotate(-32deg); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cut-fragment {
+      animation: none;
+      opacity: 0;
+    }
+    .cut-seam .cut-hot,
+    .cut-seam .cut-core {
+      animation: none;
+      opacity: 0;
+    }
+    .cut-seam .cut-char {
+      animation: none;
+      stroke-dashoffset: 0;
+      opacity: 0.85;
+    }
+  }
+  .chase-layer {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 50;
+  }
+  .chase-sprite {
+    position: absolute;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .chase-sprite img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 5px 4px rgba(0, 0, 0, 0.18));
+    transform-origin: 50% 88%;
+  }
+  .chase-human img {
+    animation: human-stride 300ms ease-in-out infinite alternate;
+  }
+  .chase-dog img {
+    animation: dog-bound 220ms ease-in-out infinite alternate;
+  }
+  .chase-dog.second img {
+    animation-delay: -110ms;
+    filter: contrast(1.12) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.16));
+  }
+  .chase-poof {
+    position: absolute;
+    border: 2px dotted rgba(42, 42, 42, 0.55);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+    animation: chase-poof 620ms ease-out forwards;
+  }
+  .shirt-shred-flight {
+    position: absolute;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .shirt-shred {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    animation: shirt-shred-flutter 240ms ease-in-out infinite alternate;
+  }
+  @keyframes human-stride {
+    from { transform: translateY(2px) rotate(-2.5deg) scaleY(1.01); }
+    to { transform: translateY(-9px) rotate(2deg) scaleY(0.97); }
+  }
+  @keyframes dog-bound {
+    from { transform: translateY(3px) rotate(-2deg) scaleX(1.02); }
+    to { transform: translateY(-8px) rotate(2.5deg) scaleX(0.98); }
+  }
+  @keyframes chase-poof {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+    22% { opacity: 0.75; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); }
+  }
+  @keyframes shirt-shred-flutter {
+    from { transform: rotate(-8deg) scaleY(0.72); }
+    to { transform: rotate(10deg) scaleY(1.08); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chase-sprite img { animation: none; }
+    .chase-poof { display: none; }
+    .shirt-shred { animation: none; }
+  }
+  .arc-photo.mid.flipped .flip-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-front, .flip-back {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .flip-back {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .code-display {
+    font-family: var(--mono);
+    font-size: 17px;
+    letter-spacing: 0.45em;
+    text-indent: 0.45em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    border-bottom: 1px dotted var(--border);
+    padding-bottom: 6px;
+  }
+  .code-display.wrong { color: #e5484d; }
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(6px, 0.7vw, 10px);
+  }
+  .keypad button {
+    font-family: var(--mono);
+    font-size: 13px;
+    width: clamp(28px, 2.6vw, 42px);
+    height: clamp(28px, 2.6vw, 42px);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  }
+  .keypad button:hover {
+    background: #2a2a2a;
+    border-color: #2a2a2a;
+    color: #fff;
+  }
+  .keypad button:active { background: #000; }
+  .keypad .zero { grid-column: 2; }
+  .arc-photo.right {
+    left: 82%;
+    bottom: 33%;
+    width: clamp(168px, 21vw, 315px);
+    transform: translate(-50%, 50%) rotate(6deg);
+  }
 
-        header {
-            margin: 20px auto;
-            padding: 5px;
-            padding-left: 40px;
-            padding-right: 40px;
-            max-width: 800px;
-            background:#ddcdf5;
-            color: black;
-            font-size: 18px;
-            font-family: Georgia, 'Times New Roman', Times, serif;
-        }
-
-        nav ul {
-            padding: 0;
-            list-style: none;
-            text-align: center;
-        }
-
-        nav ul li {
-            display: inline;
-            margin-right: 10px;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-        }
-
-        article {
-            margin-bottom: 40px;
-        }
-
-        article header h2 {
-            color: #0077cc;
-        }
-
-        h1, h2, h3 {
-            text-align: center;
-        }
-
-        aside {
-            max-width: 800px;
-            margin: 0 auto 20px;
-            padding: 20px;
-            background: #e9e9ff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        footer p {
-            text-align: center;
-            color: #666;
-        }
-    </style>
+  .year-clock, .locale { cursor: pointer; }
+  .year-grid, .map-view {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 52%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(1.04);
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .year-grid.open, .map-view.open {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+  .map-view {
+    height: 78%;
+    padding-bottom: 6svh;
+  }
+  .map-view svg {
+    width: min(92vw, 1400px);
+    max-height: calc(78svh - 100px);
+  }
+  .arc-stage {
+    transition: opacity 0.35s ease;
+  }
+  .landing.widget-open .arc-stage {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .year-grid {
+    height: 78%;
+    padding-bottom: 6svh;
+  }
+  .year-grid .cells {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(14, auto);
+    gap: 8px;
+  }
+  .year-grid .cell {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+  .year-grid .cell.fill {
+    background: #2a2a2a;
+    border-color: #2a2a2a;
+  }
+  .year-grid .cell.today {
+    border-color: #2a2a2a;
+    animation: today-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes today-pulse {
+    0%, 100% { background: #fff; }
+    50% { background: #2a2a2a; }
+  }
+  .grid-label {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .grid-label .pct, .grid-label .place { color: var(--ink); font-weight: 500; }
+</style>
 </head>
 <body>
-    <header>
-        <p>
-            This in-depth article explores how to craft engaging, personal marketing texts that boost sales through behavioral segmentation, AI-powered content, and adaptive brand voice.
-        </p>
-        <p>
-            Please Reach Out to <span style="font-weight: bold;">alexreznik23@gmail.com</span> to discuss more!
-        </p>
-    </header>
-    <main>
-        <article>
-                <h1 style="font-size: 28px;">What Makes a Marketing Text Personal?</h1>
-                <h2 style="font-style: normal; font-weight: 400; margin-top: -15px; font-size: 18px; margin-bottom: 24px;">The Role of Personalization in Effective E-Commerce Campaigns</h2>
-                <p>Posted on <time datetime="2024-09-18" style="color: grey;">September 18, 2024</time> by <span style="font-weight: 700;">Alexander Reznik</span></p>
-            <section>
-                <p style="font-style: italic; color: grey;">“We employ a vast variety of ads. If we are using twenty magazines we may use twenty separate ads. This because circulations overlap, and because a considerable percentage of people are attracted by each of several forms of approach. We wish to reach them all.” - Claude Hopkins in Scientific Advertising</p>
-                <p>Search “SMS Marketing” and you’ll find offers for “Smarter Sending”, “Personalized Messaging”, or “Conversational Texting” abound. 98% of customers open marketing SMS within fifteen minutes of reception and these three concepts are the way to improve what goes into those messages. Each refers to a component of crafting eCommerce marketing texts that sell more product: triggers, content, and style. To clarify these elements, we'll look at how leading platforms like Klaviyo, Attentive and Postscript approach personalization, and explore opportunities for brands to leverage data to improve their SMS strategy. We narrow the scope of SMS marketing to eCommerce text promotions for a surgical assessment of the term “personalization”.  </p>
-                <p>Triggers, content, style - and AI - are the pillars of potent, personal SMS that engage and convert. Customers, and the bottom line, stand to benefit from a messaging approach focused on these three axes. The path to more profitable conversations at scale runs predicates on a willingness to leverage data-understanding to power them.</p>
-            </section>
-            <section>
-                <h3>Triggers: Action Flows & Behavioral Segmentation</h3>
-                <div style="display: flex; align-items: start; gap: 20px;">
-                    <div style="width: 25%; text-align: center;">
-                        <img src="klaviyo.png" style="width: 100%; height: auto;"/>
-                        <div style="font-size: 0.75em; color: gray; margin-top: 5px;">Klaviyo Action Builder</div>
-                    </div>
-                    <p style="flex: 1;">Klaviyo is the name to know in discussions of SMS triggers. Their platform relies on web analytics to set action-based messaging activations. If you leave a pair of jeans in the shopping cart, the jean shop builds a Klaviyo action flow with a trigger for stale-cart items. Intelligent segmentation lets that jean shop divide the stale-cart customers into those who’ve recently bought an item from the store and those that haven’t. Each gets an according, distinct message. A number of integrations are offered to build triggers based on more than just web behavior, yet it remains that the both these and the segments are only as good as their underpinning data.</p>
-                </div>
-                <h4>Opportunity: AI Built and Powered Action Flows</h4>
-                <p>In Action Flow construction, there are several spots where hard-coding isn’t the best approach. One is message timing. By applying advanced analytics to customer purchase history and web behavior data, intelligent predictions about optimal reach-out timing are simple. A message is most likely to convert after some optimal number of customer stale-cart days. Machine learning determines this optimal timeframe, which can then be slotted into the "time delay" spot in the action flow. Klaviyo’s made a bet in this direction by releasing a few-click action flow builder powered by AI.</p>
-            </section>
-            <section>
-                <h3>Content: Behavioral and 3rd Party Data</h3>
-                <div style="display: flex; align-items: start; gap: 20px;">
-                    <p style="flex: 1;">There are two customer-specific data points in the example on the left: 1. The customer’s name is “Julie” and 2. She bought the “RadiantBoost Moisture Serum”. Attentive builds messages anchored on multiple customer data points, giving them a content advantage over the more simple standard. In this case, the content is based on Julie’s shopping history and customer profile. The former is an example of “internal” data to the brand - web analytics and purchase history - and the latter of “external” - 3rd party origin not i.e LinkedIn, demographic, social - data about Julie the person. Content is also a contextual influence for the selection of client-facing information, which is to say that not all the content is included. Where a customer’s made ten purchases, they’re warmed by an address as a loyal member rather than disenchanted by a recounting of all of their spending history. 
-                    </p>
-                    <div style="width: 20%; text-align: center;">
-                        <img src="attentive.png" style="width: 100%; height: auto;"/>
-                        <div style="font-size: 0.75em; color: gray; margin-top: 5px;">Attentive Message</div>
-                    </div>
-                </div>
-                <h4>Opportunity: 3rd Party Customer Data Enrichment</h4>
-                <p>The answer to “is more better?” Is a big “yes” in the message personalization case. As addressed, more data means more anchor points to use as influence for or to include in messaging. Social, behavioral, demographic, psychographic, and geographic info is underutilized in targeted content due to lack of availability. Google and Meta’s ad platforms are so successful because they do rely on this and more detailed data such as search histories, platform-purchases, and ad-clicks. Among axes to improve targeted outreach and build trust, this one sits firm at the top.</p>
-            </section>
-            <section>
-                <h3>Style: Building Trust Through A Dynamic Brand Voice</h3>
-                <p>Though there’s yet to be mention of it, texts are a form of writing, a form of prose. Syntax, tone, length, even language are factors in communicating content to customers. For personal content, the underlying content datapoints differ for each message and so a unifying style is imposed to make each sound as though spoken from the same voice. If the former jean shop knows a lot or nothing about a customer, they want the words in their message to sound like them - their store’s personality. </p>
-                <p>Tweaking brand voice is a style choice, but it’s not personalization. To personalize style, the brand voice for each message is augmented to accommodate the customer. If a platform achieved this, customers would receive branded SMS in a “voice” much closer to their preferred one. A fine-grained message personalization is unlikely to be required though (customers aren’t that unique), and a categorical, stylistic segmentation is more optimistic.</p> 
-                <div style="display: flex; justify-content: center; width: 100%;"><img src="brand_voice.png" style="width: 50%; height: auto;"/></div>
-                <p>Postscript makes an attempt via what they call their “AI Brand Center”. Stores specify and provide examples of their “voice” to be augmented and tuned to produce messages on top of tailored content. This may generate one-off messages, but functionally it’s closer to the second stage of the diagram above. Postscript forces the content into a singular voice rather than a distinct one per customer.</p>
-                <h4>Opportunity: GenAI Writing + Customer Buy-In</h4>
-                <p>“Marketing Spam” is a word that gets tossed around a fair bit. Content tailoring dispels a deal of the “ad-speak” issue, but not all. Writing messages that “speak” to a customer is the final step in e-commerce SMS that sell. GenAI makes the development of segmented voices possible.  Again, segmentation data anchors are required. If customers can be split through richer data understanding, they can be served by messages that talk to their needs. Geography is the easiest lever to pull. The in-store experience is distinct across locations, the style of speech is slightly different in a comfortable way for those shopping in their home stores. A saleswoman interacts differently with the elderly man and the young woman purchasing the same product. SMS messaging taking the same approach convert more. The best ads serve customers as though in conversation - this is achievable at scale.
-                </p>
-                <div style="width: 100%; display: flex; align-items: center; flex-direction: column;">
-                    <img src="lv_message.png" style="width: 70%; height: auto;"/>
-                    <div style="font-size: 0.75em; color: gray; margin-top: 5px;">Data Powered Style Targeting</div>
-                </div>
-            </section>
-            <section>
-                <h3>Considerations: Do Unique Messages Mean Unique Failures?</h3>
-                <p>Complete personalization isn’t a silver bullet. Data and deployed AI present a number of considerations: </p>
-                <p>1. AI Scaled Personalization generates variance in messaging content/style that lead to a subset of “bad” messages being sent out. Including a human filter that checks these messages is important to avoid missteps. AI scaled filters are possible and readily available through batched scoring systems and similar. Don’t put blind trust in a system that’s talking directly to customers.</p>
-                <p>2. Brand Voice is diluted through the process of scaled stylistic tailoring. Talking to customers in a more comfortable manner is not equivalent to giving up all sense of a brand voice. The voice is still that, but it’s singing a different song depending on the customer.</p>
-                <p>3. Messages will be perceived by some customers as “too personal”. The question of “how do you know this?” Is one to keep close when labeling content as contextual vs customer-facing. Be conscious of content inclusion since, just as in-person, customer comfortability is key to purchasing. The three drawbacks above are tampered by a human in-the-loop and an automated filter to track what’s being sent. If anything, seeing the variance play out will help to hone a concrete direction for brand’s who struggle with that.</p>
-            </section>
-            <section>
-                <h3>Incentives: Actions Do Speak Louder Than Words</h3>
-                <p>Messages with mobile coupons convert 4x better than those that don’t. i.e Value matters in the confined character count of a text. Despite attempting to replicate a conversation, SMS is a distinct form-factor where customer attention is a couple seconds not a couple minutes. Retaining attention is best accomplished through discounts. This isn’t contradictory to the personalization case as outlined. Personalization enables discounts that are jet fuel and customer data intelligence creates tailored, dynamic incentives. </p>
-                <p>Every purchase isn’t the same for the bottom line (customer lifetime value is unique) and incentives should match. Building behavioral segments with aligned incentives is the way. Give a loyal customer a bigger discount on a high ticket item left in their cart, Offer to send a special bag for the one-time “this is a luxury” customer. Promote services that will get segments to buy. All discounts aren’t made equal and this matters at scale.</p>
-            </section>
-            <section>
-                <h3>Conclusion: Data and Value Power Personalization</h3>
-                <div style="display: flex; align-items: start; gap: 20px;">
-                    <p style="flex: 1;">Klaviyo is the name to know in discussions of SMS triggers. Their platform relies on web analytics to set action-based messaging activations. If you leave a pair of jeans in the shopping cart, the jean shop builds a Klaviyo action flow with a trigger for stale-cart items. Intelligent segmentation lets that jean shop divide the stale-cart customers into those who’ve recently bought an item from the store and those that haven’t. Each gets an according, distinct message. A number of integrations are offered to build triggers based on more than just web behavior, yet it remains that the both these and the segments are only as good as their underpinning data.</p>
-                    <img src="personal_sms.png" style="width: 50%; height: auto;"/>
-                </div>
-            </section>
-        </article>
-    </main>
 
-    <footer>
-        <p>© 2024 Alexander Reznik. All rights reserved.</p>
-    </footer>
+<div class="container">
 
-    <script src="scripts.js"></script>
+  <section class="landing">
+    <div class="top-bar">
+      <div class="locale"><span class="place">North America</span>, Earth</div>
+      <div class="year-clock"><span class="pct" id="year-pct">—</span> of the year</div>
+    </div>
+    <div class="landing-head">
+      <h1><img class="wordmark" id="wordmark" src="rez-header.webp" alt="rez"><button class="launch-btn" id="launch-btn" aria-label="launch"></button></h1>
+    </div>
+    <div class="arc-stage">
+      <svg id="arc-svg" viewBox="0 0 1440 480" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <img class="rocket" id="rocket" src="rocket.webp" alt="">
+      <img class="city" id="city" src="city.webp" alt="">
+      <figure class="arc-photo left" id="eyes-photo">
+        <img src="billboard.webp" alt="Halftone street scene with billboard eyes over traffic">
+        <figcaption>-Marc Riboud</figcaption>
+      </figure>
+      <figure class="arc-photo mid" id="me-photo">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <img src="portrait.webp" alt="Halftone portrait on a staircase">
+            <figcaption>-Me</figcaption>
+          </div>
+          <div class="flip-back">
+            <div class="code-display" id="code-display">····</div>
+            <div class="keypad" id="keypad">
+              <button>1</button><button>2</button><button>3</button>
+              <button>4</button><button>5</button><button>6</button>
+              <button>7</button><button>8</button><button>9</button>
+              <button class="zero">0</button>
+            </div>
+          </div>
+        </div>
+      </figure>
+      <figure class="arc-photo right" id="dog-photo">
+        <img src="bulldogs.webp" alt="Two bulldogs and a person in sandals sitting on a brownstone stoop">
+        <figcaption>-Elliott Erwitt</figcaption>
+      </figure>
+    </div>
+
+    <div class="year-grid" id="year-grid">
+      <div class="cells" id="year-cells"></div>
+    </div>
+
+    <div class="map-view" id="map-view">
+      <svg id="map-svg" viewBox="0 0 360 146" aria-hidden="true"></svg>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const svg = document.getElementById('arc-svg');
+  const NS = 'http://www.w3.org/2000/svg';
+  const P0 = [0, 480], C = [720, -60], P2 = [1440, 480];
+  function bezier(t) {
+    const u = 1 - t;
+    return [
+      u * u * P0[0] + 2 * u * t * C[0] + t * t * P2[0],
+      u * u * P0[1] + 2 * u * t * C[1] + t * t * P2[1]
+    ];
+  }
+  function drawArc(count) {
+    for (let i = 0; i <= count; i++) {
+      const [x, y] = bezier(i / count);
+      const dot = document.createElementNS(NS, 'circle');
+      dot.setAttribute('cx', x);
+      dot.setAttribute('cy', y);
+      dot.setAttribute('r', 1);
+      dot.setAttribute('fill', '#2a2a2a');
+      svg.appendChild(dot);
+    }
+  }
+  drawArc(260);
+
+  const pctEl = document.getElementById('year-pct');
+  function tickYear() {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const end = new Date(now.getFullYear() + 1, 0, 1);
+    const pct = (now - start) / (end - start) * 100;
+    pctEl.textContent = pct.toFixed(4) + '%';
+  }
+  tickYear();
+  setInterval(tickYear, 50);
+
+  const yearGrid = document.getElementById('year-grid');
+  const yearCells = document.getElementById('year-cells');
+  function buildYearGrid() {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const end = new Date(now.getFullYear() + 1, 0, 1);
+    const daysInYear = Math.round((end - start) / 86400000);
+    const dayOfYear = Math.floor((now - start) / 86400000);
+    yearCells.innerHTML = '';
+    for (let i = 0; i < daysInYear; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell' + (i < dayOfYear ? ' fill' : i === dayOfYear ? ' today' : '');
+      yearCells.appendChild(cell);
+    }
+  }
+
+  const NA_POLYS = [
+    [[-168,66],[-160,71],[-140,70],[-125,72],[-110,73],[-95,72],[-85,70],[-75,72],[-60,60],[-55,52],[-65,45],[-70,42],[-75,35],[-80,31],[-80,25],[-84,30],[-90,29],[-97,26],[-97,20],[-87,15],[-83,9],[-79,8],[-85,12],[-95,16],[-105,20],[-110,23],[-114,28],[-117,33],[-122,37],[-124,43],[-125,49],[-132,55],[-140,60],[-150,60],[-160,55],[-165,60]],
+    [[-45,60],[-25,70],[-20,76],[-30,82],[-55,82],[-60,75],[-52,65]]
+  ];
+  const OTHER_POLYS = [
+    [[-79,8],[-70,12],[-60,10],[-50,5],[-45,-2],[-35,-8],[-38,-15],[-48,-25],[-53,-34],[-58,-39],[-65,-41],[-71,-45],[-72,-52],[-69,-55],[-75,-50],[-73,-44],[-71,-32],[-70,-18],[-76,-14],[-81,-5],[-80,0]],
+    [[-10,36],[-9,43],[-2,48],[0,51],[8,55],[10,59],[5,62],[15,68],[25,71],[40,68],[60,69],[75,72],[90,75],[110,77],[130,72],[160,70],[179,65],[170,60],[155,52],[142,50],[135,43],[127,39],[120,30],[115,22],[105,10],[100,8],[92,15],[88,21],[80,15],[77,8],[73,18],[66,24],[57,27],[50,30],[43,25],[43,17],[50,13],[43,15],[35,28],[35,33],[30,32],[27,37],[20,38],[12,44],[3,43],[-2,37],[-6,36]],
+    [[-6,35],[-10,30],[-17,20],[-17,14],[-12,8],[0,5],[9,0],[12,-5],[12,-18],[15,-27],[18,-34],[25,-34],[30,-30],[35,-22],[40,-10],[42,-2],[48,5],[51,10],[43,11],[38,18],[35,28],[30,31],[20,32],[10,37],[0,36]],
+    [[114,-22],[114,-34],[125,-32],[136,-35],[140,-38],[146,-39],[153,-30],[153,-25],[146,-19],[142,-11],[132,-11],[126,-14],[122,-18]]
+  ];
+  function inPoly(lon, lat, poly) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i], [xj, yj] = poly[j];
+      if ((yi > lat) !== (yj > lat) && lon < (xj - xi) * (lat - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  const mapView = document.getElementById('map-view');
+  const mapSvg = document.getElementById('map-svg');
+  let mapBuilt = false;
+  function buildMap() {
+    if (mapBuilt) return;
+    mapBuilt = true;
+    for (let lat = 84; lat >= -60; lat -= 2) {
+      for (let lon = -180; lon <= 180; lon += 2) {
+        const isNA = NA_POLYS.some(p => inPoly(lon, lat, p));
+        const isLand = isNA || OTHER_POLYS.some(p => inPoly(lon, lat, p));
+        if (!isLand) continue;
+        const dot = document.createElementNS(NS, 'circle');
+        dot.setAttribute('cx', lon + 180);
+        dot.setAttribute('cy', 84 - lat);
+        dot.setAttribute('r', 0.75);
+        dot.setAttribute('fill', isNA ? '#2a2a2a' : '#c9c9c9');
+        mapSvg.appendChild(dot);
+      }
+    }
+  }
+  const landing = document.querySelector('.landing');
+  let activeWidget = null;
+  function setWidget(name) {
+    activeWidget = activeWidget === name ? null : name;
+    if (activeWidget === 'year') buildYearGrid();
+    if (activeWidget === 'map') buildMap();
+    yearGrid.classList.toggle('open', activeWidget === 'year');
+    mapView.classList.toggle('open', activeWidget === 'map');
+    landing.classList.toggle('widget-open', activeWidget !== null);
+  }
+  document.querySelector('.year-clock').addEventListener('click', () => setWidget('year'));
+  document.querySelector('.locale').addEventListener('click', () => setWidget('map'));
+  yearGrid.addEventListener('click', () => setWidget('year'));
+  mapView.addEventListener('click', () => setWidget('map'));
+
+  const wordmark = document.getElementById('wordmark');
+  wordmark.style.cursor = 'pointer';
+  wordmark.addEventListener('click', () => {
+    if (activeWidget) setWidget(activeWidget);
+  });
+  function setHeader(src, alt) {
+    wordmark.src = src;
+    wordmark.alt = alt;
+    wordmark.classList.toggle('alt', src !== 'rez-header.webp');
+    wordmark.classList.toggle('eyez', src === 'eyez-header.webp');
+    wordmark.classList.toggle('uhoh', src === 'uh-oh.webp');
+  }
+  function bindHeaderSwap(photoId, src, alt) {
+    const photo = document.getElementById(photoId);
+    photo.style.cursor = 'pointer';
+    photo.addEventListener('click', () => {
+      if (wordmark.src.includes(src)) setHeader('rez-header.webp', 'rez');
+      else setHeader(src, alt);
+    });
+  }
+  const rocket = document.getElementById('rocket');
+  const arcStage = document.querySelector('.arc-stage');
+  const city = document.getElementById('city');
+  const BOOM_FRAMES = ['explode-f1.webp', 'explode-f2.webp', 'explode-f3.webp', 'explode-f4.webp', 'explode-f5.webp', 'explode-f6.webp', 'explode-f7.webp', 'explode-f8.webp', 'explode-f9.webp', 'explode-f10.webp'];
+  BOOM_FRAMES.forEach(src => { new Image().src = src; });
+  function explodeCity() {
+    city.classList.add('boom');
+    let i = 0;
+    const next = () => {
+      city.src = BOOM_FRAMES[i];
+      i++;
+      if (i < BOOM_FRAMES.length) setTimeout(next, 110);
+      else setHeader('uh-oh.webp', 'Uh Oh!');
+    };
+    next();
+  }
+  let launching = false;
+  function flyRocket() {
+    if (launching) return;
+    launching = true;
+    rocket.style.display = 'block';
+    landing.classList.remove('launch-mode');
+    landing.classList.add('launched');
+    const sw = arcStage.clientWidth, sh = arcStage.clientHeight;
+    const sx = sw / 1440, sy = sh / 480;
+    const stageRect = arcStage.getBoundingClientRect();
+    const cityRect = city.getBoundingClientRect();
+    const stopX = cityRect.left + cityRect.width * 0.55 - stageRect.left;
+    const DUR = 2500;
+    const t0 = performance.now();
+    function frame(now) {
+      const p = Math.min((now - t0) / DUR, 1);
+      const t = 1 - p;
+      const [bx, by] = bezier(t);
+      const dx = -(2 * (1 - t) * (C[0] - P0[0]) + 2 * t * (P2[0] - C[0])) * sx;
+      const dy = -(2 * (1 - t) * (C[1] - P0[1]) + 2 * t * (P2[1] - C[1])) * sy;
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI + 45;
+      rocket.style.transform = 'translate(' + (bx * sx) + 'px, ' + (by * sy) + 'px) translate(-50%, -50%) rotate(' + angle + 'deg)';
+      if (p < 1 && bx * sx > stopX) requestAnimationFrame(frame);
+      else {
+        rocket.style.display = 'none';
+        launching = false;
+        explodeCity();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  document.getElementById('launch-btn').addEventListener('click', flyRocket);
+
+  const CODE = '1234';
+  const midPhoto = document.getElementById('me-photo');
+  const codeDisplay = document.getElementById('code-display');
+  let entered = '';
+  function renderCode() {
+    codeDisplay.textContent = entered.padEnd(4, '·');
+  }
+  midPhoto.addEventListener('click', (e) => {
+    if (e.target.closest('.flip-back')) return;
+    if (!midPhoto.classList.contains('flipped') &&
+        (wordmark.src.includes('eyez-header.webp') || wordmark.src.includes('dogz-header.webp'))) {
+      setHeader('rez-header.webp', 'rez');
+      resetEyeEffect();
+      resetDogChase();
+      return;
+    }
+    midPhoto.classList.toggle('flipped');
+  });
+  document.querySelectorAll('#keypad button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (entered.length >= 4) return;
+      entered += btn.textContent;
+      renderCode();
+      if (entered.length < 4) return;
+      if (entered === CODE) {
+        landing.classList.add('launch-mode');
+        setTimeout(() => {
+          midPhoto.classList.remove('flipped');
+          entered = '';
+          renderCode();
+        }, 400);
+      } else {
+        codeDisplay.classList.add('wrong');
+        setTimeout(() => {
+          entered = '';
+          codeDisplay.classList.remove('wrong');
+          renderCode();
+        }, 500);
+      }
+    });
+  });
+
+  let portraitCutTimer = null;
+
+  function resetPortraitCut() {
+    if (portraitCutTimer) clearTimeout(portraitCutTimer);
+    portraitCutTimer = null;
+    const front = midPhoto.querySelector('.flip-front');
+    front.classList.remove('laser-cut');
+    front.style.removeProperty('--kept-clip');
+    front.style.removeProperty('--cut-clip');
+    front.querySelectorAll('.cut-fragment, .cut-seam').forEach(el => el.remove());
+  }
+
+  function clipRectangleToBeam(start, end, width, height, keepPositive) {
+    const side = point =>
+      (end.x - start.x) * (point.y - start.y) -
+      (end.y - start.y) * (point.x - start.x);
+    const inside = value => keepPositive ? value >= -0.01 : value <= 0.01;
+    const corners = [
+      { x: 0, y: 0 },
+      { x: width, y: 0 },
+      { x: width, y: height },
+      { x: 0, y: height }
+    ];
+    const result = [];
+
+    for (let i = 0; i < corners.length; i++) {
+      const current = corners[i];
+      const previous = corners[(i + corners.length - 1) % corners.length];
+      const currentSide = side(current);
+      const previousSide = side(previous);
+      const currentInside = inside(currentSide);
+      const previousInside = inside(previousSide);
+
+      if (currentInside !== previousInside) {
+        const t = previousSide / (previousSide - currentSide);
+        result.push({
+          x: previous.x + (current.x - previous.x) * t,
+          y: previous.y + (current.y - previous.y) * t
+        });
+      }
+      if (currentInside) result.push(current);
+    }
+    return result;
+  }
+
+  function polygonPath(points, width, height) {
+    return 'polygon(' + points.map(point =>
+      (point.x / width * 100).toFixed(2) + '% ' +
+      (point.y / height * 100).toFixed(2) + '%'
+    ).join(', ') + ')';
+  }
+
+  function beamAcrossRectangle(beam, width, height) {
+    const dx = beam.end.x - beam.start.x;
+    const dy = beam.end.y - beam.start.y;
+    const hits = [];
+    const addHit = (t, x, y) => {
+      if (x < -0.1 || x > width + 0.1 || y < -0.1 || y > height + 0.1) return;
+      if (hits.some(hit => Math.abs(hit.x - x) < 0.1 && Math.abs(hit.y - y) < 0.1)) return;
+      hits.push({ t, x, y });
+    };
+
+    if (Math.abs(dx) > 0.001) {
+      let t = -beam.start.x / dx;
+      addHit(t, 0, beam.start.y + t * dy);
+      t = (width - beam.start.x) / dx;
+      addHit(t, width, beam.start.y + t * dy);
+    }
+    if (Math.abs(dy) > 0.001) {
+      let t = -beam.start.y / dy;
+      addHit(t, beam.start.x + t * dx, 0);
+      t = (height - beam.start.y) / dy;
+      addHit(t, beam.start.x + t * dx, height);
+    }
+
+    hits.sort((a, b) => a.t - b.t);
+    return hits.length >= 2 ? [hits[0], hits[hits.length - 1]] : null;
+  }
+
+  function createCutSeam(centerBeam, beams, width, height) {
+    const center = beamAcrossRectangle(centerBeam, width, height);
+    if (!center) return null;
+
+    const seam = document.createElementNS(NS, 'svg');
+    seam.setAttribute('class', 'cut-seam');
+    seam.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    seam.setAttribute('preserveAspectRatio', 'none');
+    seam.setAttribute('aria-hidden', 'true');
+    seam.style.height = height + 'px';
+
+    const line = (className, points) =>
+      `<line class="${className}" pathLength="1" x1="${points[0].x}" y1="${points[0].y}" x2="${points[1].x}" y2="${points[1].y}"></line>`;
+    const visibleBeams = beams
+      .map(beam => beamAcrossRectangle(beam, width, height))
+      .filter(Boolean);
+
+    seam.innerHTML =
+      line('cut-char', center) +
+      visibleBeams.map(points => line('cut-hot', points)).join('') +
+      visibleBeams.map(points => line('cut-core', points)).join('');
+    return seam;
+  }
+
+  function cutPortrait(lasers) {
+    const front = midPhoto.querySelector('.flip-front');
+    const source = front.querySelector(':scope > img');
+    const rect = source.getBoundingClientRect();
+    const coreLines = [...lasers.querySelectorAll('.laser-beam.core')];
+    if (!rect.width || coreLines.length < 2) return;
+
+    const beams = coreLines.map(line => {
+      const matrix = line.getScreenCTM();
+      if (!matrix) return null;
+      const toLocalPoint = (x, y) => {
+        const point = lasers.createSVGPoint();
+        point.x = x;
+        point.y = y;
+        const screen = point.matrixTransform(matrix);
+        return { x: screen.x - rect.left, y: screen.y - rect.top };
+      };
+      return {
+        start: toLocalPoint(line.x1.baseVal.value, line.y1.baseVal.value),
+        end: toLocalPoint(line.x2.baseVal.value, line.y2.baseVal.value)
+      };
+    }).filter(Boolean);
+    if (beams.length < 2) return;
+
+    const lowerBeam = beams.reduce((lower, beam) =>
+      beam.start.y > lower.start.y ? beam : lower
+    );
+    const cutMargin = 20;
+    const centerBeam = {
+      start: {
+        x: lowerBeam.start.x,
+        y: lowerBeam.start.y + cutMargin
+      },
+      end: {
+        x: lowerBeam.end.x,
+        y: lowerBeam.end.y + cutMargin
+      }
+    };
+    const sideAtBottomRight =
+      (centerBeam.end.x - centerBeam.start.x) * (rect.height - centerBeam.start.y) -
+      (centerBeam.end.y - centerBeam.start.y) * (rect.width - centerBeam.start.x);
+    const keepPositive = sideAtBottomRight >= 0;
+    const kept = clipRectangleToBeam(
+      centerBeam.start, centerBeam.end, rect.width, rect.height, keepPositive
+    );
+    const cut = clipRectangleToBeam(
+      centerBeam.start, centerBeam.end, rect.width, rect.height, !keepPositive
+    );
+    if (kept.length < 3 || cut.length < 3) return;
+
+    front.style.setProperty('--kept-clip', polygonPath(kept, rect.width, rect.height));
+    front.style.setProperty('--cut-clip', polygonPath(cut, rect.width, rect.height));
+
+    const fragment = document.createElement('div');
+    fragment.className = 'cut-fragment';
+    fragment.style.height = rect.height + 'px';
+    const fragmentImage = source.cloneNode(false);
+    fragmentImage.alt = '';
+    fragmentImage.setAttribute('aria-hidden', 'true');
+    fragment.appendChild(fragmentImage);
+
+    const fragmentSeam = createCutSeam(centerBeam, beams, rect.width, rect.height);
+    const fixedSeam = createCutSeam(centerBeam, beams, rect.width, rect.height);
+    if (fragmentSeam) fragment.appendChild(fragmentSeam);
+    front.appendChild(fragment);
+    if (fixedSeam) front.appendChild(fixedSeam);
+    front.classList.add('laser-cut');
+  }
+
+  const portraitImage = midPhoto.querySelector('.flip-front > img');
+  const dogPhoto = document.getElementById('dog-photo');
+  const dogImage = dogPhoto.querySelector('img');
+  const CHASE_ASSETS = [
+    'portrait-clean.webp',
+    'bulldogs-clean.webp',
+    'running-human.webp',
+    'running-bulldog.webp'
+  ];
+  CHASE_ASSETS.forEach(src => { new Image().src = src; });
+
+  let chaseAnimations = [];
+  let chaseTimers = [];
+
+  function resetDogChase() {
+    chaseAnimations.forEach(animation => animation.cancel());
+    chaseAnimations = [];
+    chaseTimers.forEach(timer => clearTimeout(timer));
+    chaseTimers = [];
+    const layer = document.querySelector('.chase-layer');
+    if (layer) layer.remove();
+    landing.classList.remove('chase-active');
+    portraitImage.src = 'portrait.webp';
+    dogImage.src = 'bulldogs.webp';
+  }
+
+  function spawnChasePoof(layer, x, y, size, delay = 0) {
+    const poof = document.createElement('span');
+    poof.className = 'chase-poof';
+    poof.style.left = x + 'px';
+    poof.style.top = y + 'px';
+    poof.style.width = size + 'px';
+    poof.style.height = size + 'px';
+    poof.style.animationDelay = delay + 'ms';
+    layer.appendChild(poof);
+  }
+
+  function addChaseSprite(layer, options) {
+    const sprite = document.createElement('div');
+    sprite.className = 'chase-sprite ' + options.className;
+    sprite.style.left = options.x + 'px';
+    sprite.style.top = options.y + 'px';
+    sprite.style.width = options.width + 'px';
+
+    const image = document.createElement('img');
+    image.src = options.src;
+    image.alt = '';
+    image.setAttribute('aria-hidden', 'true');
+    sprite.appendChild(image);
+    layer.appendChild(sprite);
+
+    const animation = sprite.animate([
+      {
+        transform: 'translate3d(0, 0, 0)',
+        opacity: 0,
+        offset: 0
+      },
+      {
+        transform: `translate3d(${options.dx * 0.04}px, ${options.dy * 0.08 - 5}px, 0)`,
+        opacity: 1,
+        offset: 0.06
+      },
+      {
+        transform: `translate3d(${options.dx * 0.34}px, ${options.dy * 0.55 - 12}px, 0)`,
+        opacity: 1,
+        offset: 0.34
+      },
+      {
+        transform: `translate3d(${options.dx * 0.7}px, ${options.dy * 0.88 + 4}px, 0)`,
+        opacity: 1,
+        offset: 0.7
+      },
+      {
+        transform: `translate3d(${options.dx}px, ${options.dy}px, 0)`,
+        opacity: 1,
+        offset: 1
+      }
+    ], {
+      duration: options.duration,
+      delay: options.delay,
+      easing: 'linear',
+      fill: 'forwards'
+    });
+    chaseAnimations.push(animation);
+  }
+
+  function returnShirtShreds(layer, chaseBaseline) {
+    const pieces = [
+      {
+        width: 16,
+        height: 9,
+        startY: chaseBaseline - 34,
+        endX: 105,
+        endY: chaseBaseline - 78,
+        delay: 0,
+        duration: 1550,
+        clip: 'polygon(2% 22%, 37% 0, 100% 28%, 79% 100%, 22% 82%)'
+      },
+      {
+        width: 12,
+        height: 14,
+        startY: chaseBaseline - 12,
+        endX: 168,
+        endY: chaseBaseline - 20,
+        delay: 170,
+        duration: 1680,
+        clip: 'polygon(18% 0, 100% 18%, 74% 62%, 92% 100%, 15% 83%, 0 31%)'
+      },
+      {
+        width: 18,
+        height: 8,
+        startY: chaseBaseline - 58,
+        endX: 228,
+        endY: chaseBaseline - 102,
+        delay: 330,
+        duration: 1780,
+        clip: 'polygon(0 30%, 26% 5%, 57% 23%, 91% 0, 100% 68%, 63% 100%, 19% 74%)'
+      }
+    ];
+
+    pieces.forEach((piece, index) => {
+      const flight = document.createElement('div');
+      flight.className = 'shirt-shred-flight';
+      flight.style.left = -piece.width - 12 + 'px';
+      flight.style.top = piece.startY + 'px';
+      flight.style.width = piece.width + 'px';
+      flight.style.height = piece.height + 'px';
+
+      const shred = document.createElement('span');
+      shred.className = 'shirt-shred';
+      shred.style.clipPath = piece.clip;
+      shred.style.animationDelay = -index * 80 + 'ms';
+      flight.appendChild(shred);
+      layer.appendChild(flight);
+
+      const dx = piece.endX + piece.width + 12;
+      const dy = piece.endY - piece.startY;
+      const animation = flight.animate([
+        {
+          transform: 'translate3d(0, 0, 0) rotate(-100deg)',
+          opacity: 0,
+          offset: 0
+        },
+        {
+          transform: `translate3d(${dx * 0.1}px, -10px, 0) rotate(-35deg)`,
+          opacity: 1,
+          offset: 0.1
+        },
+        {
+          transform: `translate3d(${dx * 0.36}px, ${dy * 0.25 - 28}px, 0) rotate(90deg)`,
+          opacity: 1,
+          offset: 0.36
+        },
+        {
+          transform: `translate3d(${dx * 0.64}px, ${dy * 0.62 + 16}px, 0) rotate(205deg)`,
+          opacity: 1,
+          offset: 0.64
+        },
+        {
+          transform: `translate3d(${dx * 0.84}px, ${dy * 0.82 - 9}px, 0) rotate(305deg)`,
+          opacity: 1,
+          offset: 0.84
+        },
+        {
+          transform: `translate3d(${dx}px, ${dy}px, 0) rotate(380deg)`,
+          opacity: 1,
+          offset: 1
+        }
+      ], {
+        duration: piece.duration,
+        delay: piece.delay,
+        easing: 'linear',
+        fill: 'forwards'
+      });
+      chaseAnimations.push(animation);
+    });
+  }
+
+  function startDogChase() {
+    resetDogChase();
+    resetEyeEffect();
+    midPhoto.classList.remove('flipped');
+
+    const portraitRect = portraitImage.getBoundingClientRect();
+    const dogRect = dogImage.getBoundingClientRect();
+    const eyesRect = document.querySelector('#eyes-photo > img').getBoundingClientRect();
+    const layer = document.createElement('div');
+    layer.className = 'chase-layer';
+    layer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(layer);
+    landing.classList.add('chase-active');
+
+    const humanWidth = Math.max(54, portraitRect.width * 0.3);
+    const humanHeight = humanWidth * 1289 / 879;
+    const humanX = portraitRect.left + portraitRect.width * 0.57 - humanWidth * 0.42;
+    const humanY = portraitRect.top + portraitRect.height * 0.42;
+    const chaseBaseline = Math.max(humanHeight + 36, eyesRect.top - 28);
+    const humanTargetY = chaseBaseline - humanHeight;
+
+    const firstDogWidth = Math.max(54, dogRect.width * 0.28);
+    const secondDogWidth = Math.max(58, dogRect.width * 0.32);
+    const firstDogHeight = firstDogWidth * 513 / 952;
+    const secondDogHeight = secondDogWidth * 513 / 952;
+    const firstDogX = dogRect.left + dogRect.width * 0.38 - firstDogWidth * 0.5;
+    const firstDogY = dogRect.top + dogRect.height * 0.37;
+    const secondDogX = dogRect.left + dogRect.width * 0.64 - secondDogWidth * 0.5;
+    const secondDogY = dogRect.top + dogRect.height * 0.08;
+
+    portraitImage.src = 'portrait-clean.webp';
+    dogImage.src = 'bulldogs-clean.webp';
+
+    spawnChasePoof(
+      layer,
+      humanX + humanWidth * 0.5,
+      humanY + humanHeight * 0.55,
+      humanWidth * 0.72
+    );
+    spawnChasePoof(
+      layer,
+      firstDogX + firstDogWidth * 0.5,
+      firstDogY + firstDogHeight * 0.55,
+      firstDogWidth * 0.62,
+      260
+    );
+    spawnChasePoof(
+      layer,
+      secondDogX + secondDogWidth * 0.5,
+      secondDogY + secondDogHeight * 0.55,
+      secondDogWidth * 0.62,
+      470
+    );
+
+    addChaseSprite(layer, {
+      className: 'chase-human',
+      src: 'running-human.webp',
+      x: humanX,
+      y: humanY,
+      width: humanWidth,
+      dx: -humanX - humanWidth - 45,
+      dy: humanTargetY - humanY,
+      duration: 3300,
+      delay: 0
+    });
+    addChaseSprite(layer, {
+      className: 'chase-dog first',
+      src: 'running-bulldog.webp',
+      x: firstDogX,
+      y: firstDogY,
+      width: firstDogWidth,
+      dx: -firstDogX - firstDogWidth - 60,
+      dy: chaseBaseline - firstDogHeight - firstDogY + 5,
+      duration: 3100,
+      delay: 300
+    });
+    addChaseSprite(layer, {
+      className: 'chase-dog second',
+      src: 'running-bulldog.webp',
+      x: secondDogX,
+      y: secondDogY,
+      width: secondDogWidth,
+      dx: -secondDogX - secondDogWidth - 85,
+      dy: chaseBaseline - secondDogHeight - secondDogY + 10,
+      duration: 2950,
+      delay: 500
+    });
+
+    const shredTimer = setTimeout(() => {
+      if (layer.isConnected) returnShirtShreds(layer, chaseBaseline);
+    }, 3600);
+    chaseTimers.push(shredTimer);
+  }
+
+  function resetEyeEffect() {
+    const eyesPhoto = document.getElementById('eyes-photo');
+    const lasers = eyesPhoto.querySelector('.laser-layer');
+    if (lasers) lasers.remove();
+    resetPortraitCut();
+  }
+
+  function shootEyeLasers() {
+    const eyesPhoto = document.getElementById('eyes-photo');
+    resetDogChase();
+    resetEyeEffect();
+
+    const lasers = document.createElementNS(NS, 'svg');
+    lasers.setAttribute('class', 'laser-layer');
+    lasers.setAttribute('viewBox', '0 0 656 437');
+    lasers.setAttribute('aria-hidden', 'true');
+    lasers.innerHTML = `
+      <line class="laser-beam glow" pathLength="1" x1="261" y1="168" x2="3000" y2="-700"></line>
+      <line class="laser-beam glow" pathLength="1" x1="395" y1="151" x2="3134" y2="-718"></line>
+      <line class="laser-beam core" pathLength="1" x1="261" y1="168" x2="3000" y2="-700"></line>
+      <line class="laser-beam core" pathLength="1" x1="395" y1="151" x2="3134" y2="-718"></line>
+      <circle class="laser-flare" cx="261" cy="168" r="7"></circle>
+      <circle class="laser-flare" cx="395" cy="151" r="7"></circle>
+    `;
+    eyesPhoto.appendChild(lasers);
+    portraitCutTimer = setTimeout(() => {
+      portraitCutTimer = null;
+      cutPortrait(lasers);
+    }, 110);
+  }
+
+  bindHeaderSwap('dog-photo', 'dogz-header.webp', 'dogz!');
+  bindHeaderSwap('eyes-photo', 'eyez-header.webp', 'eyez!');
+  dogPhoto.addEventListener('click', () => {
+    if (wordmark.src.includes('dogz-header.webp')) startDogChase();
+    else resetDogChase();
+  });
+  document.getElementById('eyes-photo').addEventListener('click', () => {
+    if (wordmark.src.includes('eyez-header.webp')) shootEyeLasers();
+    else resetEyeEffect();
+  });
+  midPhoto.style.cursor = 'pointer';
+</script>
 </body>
 </html>

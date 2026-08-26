@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>rez — Asset Library</title>
+<link rel="stylesheet" href="design-system.css">
+<style>
+  .section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .section-title .count { font-family: var(--mono); font-size: var(--fs-tiny); font-weight: 400; color: var(--faint); letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
+  .asset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(216px, 1fr)); gap: var(--gap); }
+  .asset { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card); overflow: hidden; margin: 0; transition: border-color 0.12s ease, box-shadow 0.12s ease; }
+  .asset:hover { border-color: var(--gray-7); box-shadow: var(--shadow-md); }
+  .thumb {
+    height: 148px; display: flex; align-items: center; justify-content: center; padding: 10px;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--gray-2);
+    background-image: linear-gradient(45deg, var(--gray-3) 25%, transparent 25%), linear-gradient(-45deg, var(--gray-3) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--gray-3) 75%), linear-gradient(-45deg, transparent 75%, var(--gray-3) 75%);
+    background-size: 12px 12px;
+    background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+  }
+  .thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .asset figcaption { padding: 12px 14px 14px; }
+  .asset-name { font-family: var(--mono); font-size: var(--fs-tiny); color: var(--ink); word-break: break-all; }
+  .asset-meta { font-family: var(--mono); font-size: 10.5px; color: var(--faint); margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .asset-role { font-size: var(--fs-tiny); color: var(--muted); line-height: 1.5; margin: 8px 0 9px; }
+  .filmstrip { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+  .filmstrip .frame { flex: 0 0 auto; width: 88px; text-align: center; }
+  .filmstrip .frame img { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--gray-2); }
+  .filmstrip .frame span { display: block; margin-top: 5px; font-family: var(--mono); font-size: 10.5px; color: var(--faint); }
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; }
+  td.mono { font-family: var(--mono); font-size: var(--fs-tiny); }
+</style>
+</head>
+<body>
+<header class="page-header">
+  <h1>Asset Library</h1>
+  <p>Every image in <code>~/Desktop/personal-site</code>, what it does, and whether <code>index.html</code> actually uses it</p>
+</header>
+
+<div class="container">
+
+  <div class="summary">
+    <div class="metric"><div class="label">Assets</div><div class="value">23</div></div>
+    <div class="metric green"><div class="label">In use</div><div class="value">23</div></div>
+    <div class="metric red"><div class="label">Orphans</div><div class="value">0</div><div class="delta">0 KB dead weight</div></div>
+    <div class="metric amber"><div class="label">Total size</div><div class="value">20.6 MB</div></div>
+  </div>
+
+  <div class="panel">
+    <h2 class="section-title">Filter</h2>
+    <div class="filters">
+      <button class="active" data-filter="all">All</button>
+      <button data-filter="used">In use</button>
+      <button data-filter="unused">Orphans</button>
+      <button data-filter="cat:Wordmark">Wordmark</button>
+      <button data-filter="cat:Stage photo">Stage photo</button>
+      <button data-filter="cat:Chase plate">Chase plate</button>
+      <button data-filter="cat:Chase sprite">Chase sprite</button>
+      <button data-filter="cat:Launch">Launch</button>
+      <button data-filter="cat:Explosion frame">Explosion frame</button>
+    </div>
+    <p class="legend">Filters apply to every group below and to the inventory table.</p>
+  </div>
+
+  <div class="panel group" data-cat="Wordmark">
+    <h2 class="section-title">Wordmark<span class="count">4 files &middot; 4.1 MB</span></h2>
+    <div class="asset-grid">
+    <figure class="asset" data-cat="Wordmark" data-used="yes">
+      <div class="thumb"><img src="dogz-header.webp" alt="dogz-header.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">dogz-header.webp</div>
+        <div class="asset-meta">570x265 &middot; 208 KB &middot; 3 refs</div>
+        <div class="asset-role">Swaps in when the bulldogs photo is clicked. Arms the chase.</div>
+        <span class="badge blue">Wordmark</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Wordmark" data-used="yes">
+      <div class="thumb"><img src="eyez-header.webp" alt="eyez-header.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">eyez-header.webp</div>
+        <div class="asset-meta">565x275 &middot; 147 KB &middot; 4 refs</div>
+        <div class="asset-role">Swaps in when the billboard photo is clicked. Arms the laser.</div>
+        <span class="badge blue">Wordmark</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Wordmark" data-used="yes">
+      <div class="thumb"><img src="rez-header.webp" alt="rez-header.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">rez-header.webp</div>
+        <div class="asset-meta">1536x1024 &middot; 2.1 MB &middot; 4 refs</div>
+        <div class="asset-role">Default &quot;rez&quot; wordmark in the header.</div>
+        <span class="badge blue">Wordmark</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Wordmark" data-used="yes">
+      <div class="thumb"><img src="uh-oh.webp" alt="uh-oh.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">uh-oh.webp</div>
+        <div class="asset-meta">1773x887 &middot; 1.7 MB &middot; 2 refs</div>
+        <div class="asset-role">Replaces the wordmark after the city explodes.</div>
+        <span class="badge blue">Wordmark</span>
+      </figcaption>
+    </figure>
+    </div>
+  </div>
+  <div class="panel group" data-cat="Stage photo">
+    <h2 class="section-title">Stage photo<span class="count">3 files &middot; 6.5 MB</span></h2>
+    <div class="asset-grid">
+    <figure class="asset" data-cat="Stage photo" data-used="yes">
+      <div class="thumb"><img src="billboard.webp" alt="billboard.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">billboard.webp</div>
+        <div class="asset-meta">1535x1024 &middot; 2.8 MB &middot; 1 ref</div>
+        <div class="asset-role">Left photo on the arc — Marc Riboud. Laser origin.</div>
+        <span class="badge purple">Stage photo</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Stage photo" data-used="yes">
+      <div class="thumb"><img src="bulldogs.webp" alt="bulldogs.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">bulldogs.webp</div>
+        <div class="asset-meta">600x390 &middot; 118 KB &middot; 2 refs</div>
+        <div class="asset-role">Right photo — Elliott Erwitt. Source of the two dogs.</div>
+        <span class="badge purple">Stage photo</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Stage photo" data-used="yes">
+      <div class="thumb"><img src="portrait.webp" alt="portrait.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">portrait.webp</div>
+        <div class="asset-meta">1086x1448 &middot; 3.6 MB &middot; 2 refs</div>
+        <div class="asset-role">Centre photo — flips to reveal the keypad. Target of the laser cut.</div>
+        <span class="badge purple">Stage photo</span>
+      </figcaption>
+    </figure>
+    </div>
+  </div>
+  <div class="panel group" data-cat="Chase plate">
+    <h2 class="section-title">Chase plate<span class="count">2 files &middot; 4.3 MB</span></h2>
+    <div class="asset-grid">
+    <figure class="asset" data-cat="Chase plate" data-used="yes">
+      <div class="thumb"><img src="bulldogs-clean.webp" alt="bulldogs-clean.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">bulldogs-clean.webp</div>
+        <div class="asset-meta">600x390 &middot; 550 KB &middot; 2 refs</div>
+        <div class="asset-role">Stoop with the dogs erased; swapped in when the chase starts.</div>
+        <span class="badge amber">Chase plate</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Chase plate" data-used="yes">
+      <div class="thumb"><img src="portrait-clean.webp" alt="portrait-clean.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">portrait-clean.webp</div>
+        <div class="asset-meta">1086x1448 &middot; 3.8 MB &middot; 2 refs</div>
+        <div class="asset-role">Portrait with the human erased; swapped in when the chase starts.</div>
+        <span class="badge amber">Chase plate</span>
+      </figcaption>
+    </figure>
+    </div>
+  </div>
+  <div class="panel group" data-cat="Chase sprite">
+    <h2 class="section-title">Chase sprite<span class="count">2 files &middot; 2.3 MB</span></h2>
+    <div class="asset-grid">
+    <figure class="asset" data-cat="Chase sprite" data-used="yes">
+      <div class="thumb"><img src="running-bulldog.webp" alt="running-bulldog.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">running-bulldog.webp</div>
+        <div class="asset-meta">952x513 &middot; 910 KB &middot; 3 refs</div>
+        <div class="asset-role">Bulldog sprite, used twice with offset delay (952x513 ratio hard-coded).</div>
+        <span class="badge amber">Chase sprite</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Chase sprite" data-used="yes">
+      <div class="thumb"><img src="running-human.webp" alt="running-human.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">running-human.webp</div>
+        <div class="asset-meta">879x1289 &middot; 1.5 MB &middot; 2 refs</div>
+        <div class="asset-role">Runner sprite animated across the viewport (879x1289 ratio hard-coded).</div>
+        <span class="badge amber">Chase sprite</span>
+      </figcaption>
+    </figure>
+    </div>
+  </div>
+  <div class="panel group" data-cat="Launch">
+    <h2 class="section-title">Launch<span class="count">2 files &middot; 2.1 MB</span></h2>
+    <div class="asset-grid">
+    <figure class="asset" data-cat="Launch" data-used="yes">
+      <div class="thumb"><img src="city.webp" alt="city.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">city.webp</div>
+        <div class="asset-meta">1536x1024 &middot; 1.3 MB &middot; 1 ref</div>
+        <div class="asset-role">Skyline that fades in at bottom-left; becomes the explosion target.</div>
+        <span class="badge green">Launch</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Launch" data-used="yes">
+      <div class="thumb"><img src="rocket.webp" alt="rocket.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">rocket.webp</div>
+        <div class="asset-meta">1254x1254 &middot; 844 KB &middot; 1 ref</div>
+        <div class="asset-role">Flies the Bezier arc after the keypad code 1234 is entered.</div>
+        <span class="badge green">Launch</span>
+      </figcaption>
+    </figure>
+    </div>
+  </div>
+  <div class="panel group" data-cat="Explosion frame">
+    <h2 class="section-title">Explosion frame<span class="count">10 files &middot; 1.4 MB</span></h2>
+    <div class="asset-grid">
+    <figure class="asset" data-cat="Explosion frame" data-used="yes">
+      <div class="thumb"><img src="explode-f1.webp" alt="explode-f1.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">explode-f1.webp</div>
+        <div class="asset-meta">334x355 &middot; 148 KB &middot; 1 ref</div>
+        <div class="asset-role">Frame 1 of 10 in the city explosion, swapped at 110ms intervals.</div>
+        <span class="badge green">Explosion frame</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Explosion frame" data-used="yes">
+      <div class="thumb"><img src="explode-f2.webp" alt="explode-f2.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">explode-f2.webp</div>
+        <div class="asset-meta">335x355 &middot; 140 KB &middot; 1 ref</div>
+        <div class="asset-role">Frame 2 of 10 in the city explosion, swapped at 110ms intervals.</div>
+        <span class="badge green">Explosion frame</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Explosion frame" data-used="yes">
+      <div class="thumb"><img src="explode-f3.webp" alt="explode-f3.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">explode-f3.webp</div>
+        <div class="asset-meta">334x355 &middot; 137 KB &middot; 1 ref</div>
+        <div class="asset-role">Frame 3 of 10 in the city explosion, swapped at 110ms intervals.</div>
+        <span class="badge green">Explosion frame</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Explosion frame" data-used="yes">
+      <div class="thumb"><img src="explode-f4.webp" alt="explode-f4.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">explode-f4.webp</div>
+        <div class="asset-meta">334x355 &middot; 180 KB &middot; 1 ref</div>
+        <div class="asset-role">Frame 4 of 10 in the city explosion, swapped at 110ms intervals.</div>
+        <span class="badge green">Explosion frame</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Explosion frame" data-used="yes">
+      <div class="thumb"><img src="explode-f5.webp" alt="explode-f5.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">explode-f5.webp</div>
+        <div class="asset-meta">335x355 &middot; 154 KB &middot; 1 ref</div>
+        <div class="asset-role">Frame 5 of 10 in the city explosion, swapped at 110ms intervals.</div>
+        <span class="badge green">Explosion frame</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Explosion frame" data-used="yes">
+      <div class="thumb"><img src="explode-f6.webp" alt="explode-f6.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">explode-f6.webp</div>
+        <div class="asset-meta">335x355 &middot; 169 KB &middot; 1 ref</div>
+        <div class="asset-role">Frame 6 of 10 in the city explosion, swapped at 110ms intervals.</div>
+        <span class="badge green">Explosion frame</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Explosion frame" data-used="yes">
+      <div class="thumb"><img src="explode-f7.webp" alt="explode-f7.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">explode-f7.webp</div>
+        <div class="asset-meta">334x355 &middot; 180 KB &middot; 1 ref</div>
+        <div class="asset-role">Frame 7 of 10 in the city explosion, swapped at 110ms intervals.</div>
+        <span class="badge green">Explosion frame</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Explosion frame" data-used="yes">
+      <div class="thumb"><img src="explode-f8.webp" alt="explode-f8.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">explode-f8.webp</div>
+        <div class="asset-meta">334x355 &middot; 151 KB &middot; 1 ref</div>
+        <div class="asset-role">Frame 8 of 10 in the city explosion, swapped at 110ms intervals.</div>
+        <span class="badge green">Explosion frame</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Explosion frame" data-used="yes">
+      <div class="thumb"><img src="explode-f9.webp" alt="explode-f9.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">explode-f9.webp</div>
+        <div class="asset-meta">335x355 &middot; 94 KB &middot; 1 ref</div>
+        <div class="asset-role">Frame 9 of 10 in the city explosion, swapped at 110ms intervals.</div>
+        <span class="badge green">Explosion frame</span>
+      </figcaption>
+    </figure>
+    <figure class="asset" data-cat="Explosion frame" data-used="yes">
+      <div class="thumb"><img src="explode-f10.webp" alt="explode-f10.webp" loading="lazy"></div>
+      <figcaption>
+        <div class="asset-name">explode-f10.webp</div>
+        <div class="asset-meta">334x355 &middot; 61 KB &middot; 1 ref</div>
+        <div class="asset-role">Frame 10 of 10 in the city explosion, swapped at 110ms intervals.</div>
+        <span class="badge green">Explosion frame</span>
+      </figcaption>
+    </figure>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="section-title">Explosion sequence<span class="count">10 frames &middot; 110ms each</span></h2>
+    <div class="filmstrip"><div class="frame"><img src="explode-f1.webp" alt="" loading="lazy"><span>f1</span></div><div class="frame"><img src="explode-f2.webp" alt="" loading="lazy"><span>f2</span></div><div class="frame"><img src="explode-f3.webp" alt="" loading="lazy"><span>f3</span></div><div class="frame"><img src="explode-f4.webp" alt="" loading="lazy"><span>f4</span></div><div class="frame"><img src="explode-f5.webp" alt="" loading="lazy"><span>f5</span></div><div class="frame"><img src="explode-f6.webp" alt="" loading="lazy"><span>f6</span></div><div class="frame"><img src="explode-f7.webp" alt="" loading="lazy"><span>f7</span></div><div class="frame"><img src="explode-f8.webp" alt="" loading="lazy"><span>f8</span></div><div class="frame"><img src="explode-f9.webp" alt="" loading="lazy"><span>f9</span></div><div class="frame"><img src="explode-f10.webp" alt="" loading="lazy"><span>f10</span></div></div>
+    <p class="legend">Played by <code>explodeCity()</code> — a chained <code>setTimeout</code> swapping <code>city.src</code>.</p>
+  </div>
+
+  <div class="panel">
+    <h2 class="section-title">Inventory</h2>
+    <table id="data-table">
+      <thead>
+        <tr><th>File</th><th>Role</th><th class="num">Dimensions</th><th class="num">Size</th><th class="num">Refs</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr data-used="yes"><td class="mono">dogz-header.webp</td><td>Wordmark</td><td class="num">570x265</td><td class="num">208 KB</td><td class="num">3</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">eyez-header.webp</td><td>Wordmark</td><td class="num">565x275</td><td class="num">147 KB</td><td class="num">4</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">rez-header.webp</td><td>Wordmark</td><td class="num">1536x1024</td><td class="num">2.1 MB</td><td class="num">4</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">uh-oh.webp</td><td>Wordmark</td><td class="num">1773x887</td><td class="num">1.7 MB</td><td class="num">2</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">billboard.webp</td><td>Stage photo</td><td class="num">1535x1024</td><td class="num">2.8 MB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">bulldogs.webp</td><td>Stage photo</td><td class="num">600x390</td><td class="num">118 KB</td><td class="num">2</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">portrait.webp</td><td>Stage photo</td><td class="num">1086x1448</td><td class="num">3.6 MB</td><td class="num">2</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">bulldogs-clean.webp</td><td>Chase plate</td><td class="num">600x390</td><td class="num">550 KB</td><td class="num">2</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">portrait-clean.webp</td><td>Chase plate</td><td class="num">1086x1448</td><td class="num">3.8 MB</td><td class="num">2</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">running-bulldog.webp</td><td>Chase sprite</td><td class="num">952x513</td><td class="num">910 KB</td><td class="num">3</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">running-human.webp</td><td>Chase sprite</td><td class="num">879x1289</td><td class="num">1.5 MB</td><td class="num">2</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">city.webp</td><td>Launch</td><td class="num">1536x1024</td><td class="num">1.3 MB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">rocket.webp</td><td>Launch</td><td class="num">1254x1254</td><td class="num">844 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">explode-f1.webp</td><td>Explosion frame</td><td class="num">334x355</td><td class="num">148 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">explode-f2.webp</td><td>Explosion frame</td><td class="num">335x355</td><td class="num">140 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">explode-f3.webp</td><td>Explosion frame</td><td class="num">334x355</td><td class="num">137 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">explode-f4.webp</td><td>Explosion frame</td><td class="num">334x355</td><td class="num">180 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">explode-f5.webp</td><td>Explosion frame</td><td class="num">335x355</td><td class="num">154 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">explode-f6.webp</td><td>Explosion frame</td><td class="num">335x355</td><td class="num">169 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">explode-f7.webp</td><td>Explosion frame</td><td class="num">334x355</td><td class="num">180 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">explode-f8.webp</td><td>Explosion frame</td><td class="num">334x355</td><td class="num">151 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">explode-f9.webp</td><td>Explosion frame</td><td class="num">335x355</td><td class="num">94 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+        <tr data-used="yes"><td class="mono">explode-f10.webp</td><td>Explosion frame</td><td class="num">334x355</td><td class="num">61 KB</td><td class="num">1</td><td><span class="badge green">In use</span></td></tr>
+      </tbody>
+    </table>
+    <p class="legend">Ref count = literal occurrences of the filename in <code>index.html</code> (includes preload lists and reset assignments).</p>
+  </div>
+
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('.filters button');
+  const assets = document.querySelectorAll('.asset');
+  const groups = document.querySelectorAll('.group');
+  const rows = document.querySelectorAll('#data-table tbody tr');
+  const match = (el, f) => {
+    if (f === 'all') return true;
+    if (f === 'used') return el.dataset.used === 'yes';
+    if (f === 'unused') return el.dataset.used === 'no';
+    return el.dataset.cat === f.slice(4);
+  };
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      assets.forEach(el => el.style.display = match(el, f) ? '' : 'none');
+      rows.forEach(el => el.style.display = match(el, f) ? '' : 'none');
+      groups.forEach(g => {
+        const any = [...g.querySelectorAll('.asset')].some(a => a.style.display !== 'none');
+        g.style.display = any ? '' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>
